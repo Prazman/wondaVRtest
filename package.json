@@ -1,0 +1,16 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Programming Test",
+  "main": "stats.js",
+  "scripts": {
+    "generate-data": "node --max-old-space-size=2048 generate-data.js",
+    "generate-reports": "node generate-reports.js"
+  },
+  "author": "",
+  "license": "Private",
+  "dependencies": {
+    "faker": "^4.1.0"
+  }
+}
