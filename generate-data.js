@@ -2,9 +2,10 @@ const fs = require('fs');
 const faker = require('faker');
 faker.seed(1000);
 
+
 const dataDir = './data/';
 
-const usersCount = 100;
+const usersCount = 500;
 const meanProjectsPerUser = 10;
 const meanVisitsPerProject = 100;
 
@@ -12,8 +13,15 @@ const registerMinDate = new Date('2016-01-01');
 const registerMaxDate = new Date('2017-12-31');
 const maxVisitDate = new Date('2018-05-31');
 
-const users = [];
-for (let i = 0; i < usersCount; i++) {
+const userFilePath = dataDir + "users.json";
+const projectFilePath = dataDir + "projects.json"
+const visitFilePath = dataDir + "visits.json"
+const user_data = [],
+    project_data = []
+/*
+Generate random user object
+*/
+function generateUser() {
     const user = {
         userId: faker.random.uuid(),
         avatar: faker.image.avatar(),
@@ -25,43 +33,69 @@ for (let i = 0; i < usersCount; i++) {
         password: faker.random.word(),
         registrationDate: faker.date.between(registerMinDate, registerMaxDate),
     };
-    users.push(user);
+    user_data.push({
+        id: user.userId,
+        registrationDate: user.registrationDate
+    })
+    return user;
 }
-
-const projects = [];
-const projectsCount = Math.round(usersCount * meanProjectsPerUser);
-for (let i = 0; i < projectsCount; i++) {
-    const user = faker.random.arrayElement(users);
+/*
+Generate random project object for random user
+*/
+function generateProject() {
+    const user = faker.random.arrayElement(user_data);
     const project = {
         projectId: faker.random.uuid(),
-        authorId: user.userId,
+        authorId: user.id,
         title: faker.random.words(),
         description: faker.lorem.sentences(3, 1),
         url: faker.internet.url(),
         creationDate: faker.date.between(user.registrationDate, registerMaxDate),
     };
-    projects.push(project);
+    project_data.push({
+        id: project.projectId,
+        creationDate: project.creationDate
+    })
+    return project
 }
-
-const visits = [];
-const visitsCount = Math.round(projectsCount * meanVisitsPerProject);
-for (let i = 0; i < visitsCount; i++) {
-    const project = faker.random.arrayElement(projects);
+/*
+Generate random visit object for random project
+*/
+function generateVisit() {
+    const project = faker.random.arrayElement(project_data);
     const visit = {
         id: faker.random.uuid(),
-        projectId: project.projectId,
+        projectId: project.id,
         ip: faker.internet.ip(),
         userAgent: faker.internet.userAgent(),
         country: faker.address.country(),
         date: faker.date.between(project.creationDate, maxVisitDate),
     };
-    visits.push(visit);
+    return visit
 }
-
-if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir);
+/*
+Generate objects and write them on the fly to a JSON file, to save memory
+path: path to the destination file
+objectCount: number of objects to generate
+generationFunction: function that generates one object
+*/
+function jsonFileGenerator(path, objectCount, generationFunction) {
+    fs.writeFileSync(path, "[");
+    for (let i = 0; i < objectCount; i++) {
+        let object = generationFunction()
+        fs.appendFileSync(path, JSON.stringify(object))
+        if (i < objectCount - 1) {
+            fs.appendFileSync(path, ",")
+        }
+    }
+    fs.appendFileSync(path, "]")
 }
-
-fs.writeFileSync(dataDir + 'users.json', JSON.stringify(users, null, 2));
-fs.writeFileSync(dataDir + 'projects.json', JSON.stringify(projects, null, 2));
-fs.writeFileSync(dataDir + 'visits.json', JSON.stringify(visits, null, 2));
+/*use of jsonFileGenerator to avoid memory issues:
+-when creating huge arrays of objects
+-when running JSON.stringify on a huge array of objects
+ */
+jsonFileGenerator(userFilePath, usersCount, generateUser);
+const projectsCount = Math.round(usersCount * meanProjectsPerUser);
+jsonFileGenerator(projectFilePath, projectsCount, generateProject);
+const visitsCount = Math.round(projectsCount * meanVisitsPerProject);
+jsonFileGenerator(visitFilePath, visitsCount, generateVisit);

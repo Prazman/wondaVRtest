@@ -5,7 +5,7 @@
   "description": "Programming Test",
   "main": "stats.js",
   "scripts": {
-    "generate-data": "node --max-old-space-size=2048 generate-data.js",
+    "generate-data": "node --max-old-space-size=128 generate-data.js",
     "generate-reports": "node generate-reports.js"
   },
   "author": "",
