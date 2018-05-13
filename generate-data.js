@@ -4,7 +4,7 @@ faker.seed(1000);
 
 const dataDir = './data/';
 
-const usersCount = 1000;
+const usersCount = 100;
 const meanProjectsPerUser = 10;
 const meanVisitsPerProject = 100;
 
