@@ -8,10 +8,14 @@ function readJSONFile(path) {
     return result;
 }
 
-function arrayToCSV(path, array){
+function arrayToCSV(path, array, exclude_fields = []){
 	var writer = csvWriter()
     writer.pipe(fs.createWriteStream(path))
     for(let i = 0; i<array.length; i++){
+    	for(let j = 0; j < exclude_fields.length; j++){
+    		console.log(exclude_fields[j])
+    		delete array[i][exclude_fields[j]]
+    	}
     	writer.write(array[i])
     }
     writer.end()
@@ -105,7 +109,7 @@ let user_report = generateUserReport(project_report)
 if (!fs.existsSync(output_dir)) {
     fs.mkdirSync(output_dir);
 }
-arrayToCSV(output_dir + "projects.csv", project_report);
+arrayToCSV(output_dir + "projects.csv", project_report, ['authorId','visitDistribution']);
 arrayToCSV(output_dir + "users.csv", user_report);
 
 console.log(user_report)
