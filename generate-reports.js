@@ -1,10 +1,20 @@
 var fs = require('fs');
-
+var csvWriter = require('csv-write-stream');
+const output_dir = "./output/"
 function readJSONFile(path) {
     let fs = require("fs");
     const content = fs.readFileSync(path);
     const result = JSON.parse(content);
     return result;
+}
+
+function arrayToCSV(path, array){
+	var writer = csvWriter()
+    writer.pipe(fs.createWriteStream(path))
+    for(let i = 0; i<array.length; i++){
+    	writer.write(array[i])
+    }
+    writer.end()
 }
 
 function generateProjectReport() {
@@ -91,4 +101,11 @@ let all_visits = readJSONFile('./data/visits.json');
 let project_report = generateProjectReport();
 
 let user_report = generateUserReport(project_report)
+
+if (!fs.existsSync(output_dir)) {
+    fs.mkdirSync(output_dir);
+}
+arrayToCSV(output_dir + "projects.csv", project_report);
+arrayToCSV(output_dir + "users.csv", user_report);
+
 console.log(user_report)

@@ -11,6 +11,7 @@
   "author": "",
   "license": "Private",
   "dependencies": {
+    "csv-write-stream": "^2.0.0",
     "faker": "^4.1.0"
   }
 }
