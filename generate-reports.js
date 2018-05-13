@@ -36,7 +36,7 @@ function generateProjectReport() {
                 topVisitCount = visitDistribution[visit.country]
             }
         }
-        project.visitCount = visits.length
+        project.visitsCount = visits.length
         project.topVisitCountry = topVisitCountry
         project.visitDistribution = visitDistribution
         project_report.push(project)
@@ -45,7 +45,7 @@ function generateProjectReport() {
     return project_report
 }
 
-function generateUserReport(){
+function generateUserReport(project_report){
 	let user_report = [];
 	for( let  i = 0; i< all_users.length; i++){
 		let current_user = all_users[i];
@@ -55,8 +55,34 @@ function generateUserReport(){
 			email: current_user.email
 		}
 		let projects = project_report.filter((el) => el.authorId == current_user.userId)
-		console.log(projects)
+		
+		let topVisitsCountry,
+		topVisitsCount = 0,
+		totalVisitDistribution = {},
+		visitsCount = 0
+		for(let j = 0; j < projects.length; j++){
+			let project = projects[j];
+			visitsCount += project.visitsCount
+			for (country in project.visitDistribution){
+				if(totalVisitDistribution[country]){
+					totalVisitDistribution[country] += project.visitDistribution[country]
+				}
+				else{
+					totalVisitDistribution[country] = project.visitDistribution[country]
+				}
+				if(totalVisitDistribution[country]> topVisitsCount){
+					topVisitsCountry = country
+					topVisitsCount = totalVisitDistribution[country]
+				}
+			}
+		}
+
+		user.projectsCount = projects.length
+		user.visitsCount = visitsCount
+		user.topVisitsCountry = topVisitsCountry
+		user_report.push(user);
 	}
+	return user_report
 }
 let all_users = readJSONFile('./data/users.json');
 let all_projects = readJSONFile('./data/projects.json');
@@ -64,4 +90,5 @@ let all_visits = readJSONFile('./data/visits.json');
 
 let project_report = generateProjectReport();
 
-generateUserReport()
+let user_report = generateUserReport(project_report)
+console.log(user_report)
