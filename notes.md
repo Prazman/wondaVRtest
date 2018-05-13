@@ -1,3 +1,25 @@
-Just after install, script fails on writing visit array to file
---> Memory error on JSON.stringify because array is too big
--> Reduced the number of users for now
+
+# Project notes
+## Dependencies:
+-csv-write-stream: CSV writing package
+
+## Technology stack: 
+Just Node.js
+Alternatively: A mongoDB database could be used to solve this problem:
+-Read the JSON files
+-Store all the documents in the mongo base
+-Get project report and user report using mongoDB aggregate queries
+-Write CSV files
+
+## Possible improvments:
+### Error checking: 
+The script works because data source is automatically generated data. A real data source would probably contains incorrect data (example: unexisting authorId from project).
+In this case, an error handling strategy would prevent the script failing.
+
+### Memory limit:
+ In case of really big JSON files, use of a mongo database would probably be mandatory, to avoid loading huge arrays of objects into memory
+
+## About generate-data.js
+Script fails right after install on writing visits.json file.
+--> Memory error because the array to stringify before writing is too big
+--> need to optimize it to run on low memory machines
